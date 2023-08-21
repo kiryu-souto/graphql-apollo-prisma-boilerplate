@@ -1,0 +1,49 @@
+version: '3'
+
+services:   
+  graphql:
+    container_name: graphql
+    build: ./dockerfiles/graphql
+    tty: true
+    restart: always
+    working_dir: /graphql
+    command: npm run start 
+    volumes:
+      - ./dockerfiles/graphql/graphql:/graphql
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
+
+  prisma:
+    container_name: prisma
+    build: ./dockerfiles/graphql
+    tty: true
+    restart: always
+    working_dir: /graphql
+    command: npx prisma studio
+    volumes:
+      - ./dockerfiles/graphql/graphql:/graphql
+    ports:
+      - '5555:5555'
+    depends_on:
+      - db
+  
+  db:
+    image: mysql:8.1.0
+    container_name: mysql_host
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: prisma
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    expose:
+      - 3306
+    ports:
+      - '3306:3306'
+
+volumes:
+  mysql-data:
